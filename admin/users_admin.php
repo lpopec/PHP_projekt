@@ -1,144 +1,160 @@
 <?php
-if (isset($_GET['delete_user_id'])) {
-    $id = $_GET['delete_user_id'];
+global $dbc;
+if (!$dbc) { include 'dbconn.php'; }
+
+if (isset($_GET['delete_id'])) {
+    $id = (int)$_GET['delete_id'];
+    if ($id == $_SESSION['user_id']) {
+        echo "<script>alert('Ne možete obrisati sami sebe!'); window.location='$link_admin&action=users';</script>"; exit();
+    }
     mysqli_query($dbc, "DELETE FROM users WHERE id = $id");
-    header("Location: index.php?menu=5&action=users");
-    exit();
+    header("Location: $link_admin&action=users"); exit();
 }
 
 if (isset($_POST['save_user'])) {
-    $username = mysqli_real_escape_string($dbc, $_POST['username']);
-    $email = mysqli_real_escape_string($dbc, $_POST['email']);
+    $id = $_POST['id'];
     $first_name = mysqli_real_escape_string($dbc, $_POST['first_name']);
     $last_name = mysqli_real_escape_string($dbc, $_POST['last_name']);
+    $email = mysqli_real_escape_string($dbc, $_POST['email']);
+    $username = mysqli_real_escape_string($dbc, $_POST['username']);
     $role = mysqli_real_escape_string($dbc, $_POST['role']);
-    $id = $_POST['id'];
+    $country_code = mysqli_real_escape_string($dbc, $_POST['country']);
     
-    $pass_query_part = "";
+    $password_sql = "";
     if (!empty($_POST['password'])) {
-        $hashed_pwd = password_hash($_POST['password'], PASSWORD_DEFAULT);
-        $pass_query_part = ", password='$hashed_pwd'";
+        $hashed_pass = password_hash($_POST['password'], PASSWORD_DEFAULT);
+        $password_sql = ", password = '$hashed_pass'";
     }
 
     if ($id) {
-        $query = "UPDATE users SET 
-                  username='$username', 
-                  email='$email',
-                  first_name='$first_name', 
-                  last_name='$last_name', 
-                  role='$role' 
-                  $pass_query_part 
-                  WHERE id=$id";
+        $query = "UPDATE users SET first_name='$first_name', last_name='$last_name', email='$email', username='$username', role='$role', country_code='$country_code' $password_sql WHERE id=$id";
+        mysqli_query($dbc, $query);
     } else {
-        $hashed_pwd = password_hash($_POST['password'], PASSWORD_DEFAULT);
-        $query = "INSERT INTO users (username, password, email, first_name, last_name, role) 
-                  VALUES ('$username', '$hashed_pwd', '$email', '$first_name', '$last_name', '$role')";
+        if (empty($_POST['password'])) {
+            echo "<script>alert('Lozinka je obavezna!');</script>";
+        } else {
+            $hashed_pass = password_hash($_POST['password'], PASSWORD_DEFAULT);
+            $query = "INSERT INTO users (first_name, last_name, email, username, password, role, country_code) 
+                      VALUES ('$first_name', '$last_name', '$email', '$username', '$hashed_pass', '$role', '$country_code')";
+            mysqli_query($dbc, $query);
+        }
     }
-    
-    $result = mysqli_query($dbc, $query);
-    
-    if (!$result) {
-        die("Greška kod spremanja korisnika: " . mysqli_error($dbc));
-    }
-
-    header("Location: index.php?menu=5&action=users");
-    exit();
+    header("Location: $link_admin&action=users"); exit();
 }
 
 $edit_mode = isset($_GET['edit']);
-$edit_row = [];
+$user_row = [];
 if ($edit_mode && isset($_GET['id'])) {
-    $id = $_GET['id'];
+    $id = (int)$_GET['id'];
     $r = mysqli_query($dbc, "SELECT * FROM users WHERE id=$id");
-    $edit_row = mysqli_fetch_assoc($r);
+    $user_row = mysqli_fetch_assoc($r);
 }
 ?>
 
 <?php if ($edit_mode || isset($_GET['add'])): ?>
     
     <div class="admin-form-container">
-        <h3><?php echo isset($_GET['add']) ? 'Dodaj Novog Korisnika' : 'Uredi Korisnika'; ?></h3>
-        <a href="index.php?menu=5&action=users" class="btn-back">&larr; Natrag</a>
+        <h3><?php echo isset($_GET['add']) ? 'Dodaj korisnika' : 'Uredi korisnika'; ?></h3>
+        <a href="<?php echo $link_admin; ?>&action=users" class="btn-back">&larr; Natrag</a>
         
-        <form method="post" action="index.php?menu=5&action=users">
-            <input type="hidden" name="id" value="<?php echo isset($edit_row['id']) ? $edit_row['id'] : ''; ?>">
+        <form method="post" action="<?php echo $link_admin; ?>&action=users">
+            <input type="hidden" name="id" value="<?php echo isset($user_row['id']) ? $user_row['id'] : ''; ?>">
+            
+            <div class="form-group"><label>Ime:</label><input type="text" name="first_name" value="<?php echo isset($user_row['first_name']) ? $user_row['first_name'] : ''; ?>" required></div>
+            <div class="form-group"><label>Prezime:</label><input type="text" name="last_name" value="<?php echo isset($user_row['last_name']) ? $user_row['last_name'] : ''; ?>" required></div>
+            <div class="form-group"><label>Email:</label><input type="email" name="email" value="<?php echo isset($user_row['email']) ? $user_row['email'] : ''; ?>" required></div>
+            <div class="form-group"><label>Username:</label><input type="text" name="username" value="<?php echo isset($user_row['username']) ? $user_row['username'] : ''; ?>" required></div>
             
             <div class="form-group">
-                <label>Ime (First Name):</label>
-                <input type="text" name="first_name" value="<?php echo isset($edit_row['first_name']) ? $edit_row['first_name'] : ''; ?>" required>
+                <label>Država:</label>
+                <select name="country" class="form-control">
+                    <option value="">Odaberite državu...</option>
+                    <?php
+                    $q_c = "SELECT * FROM countries ORDER BY name ASC";
+                    $r_c = mysqli_query($dbc, $q_c);
+                    while($c = mysqli_fetch_assoc($r_c)) {
+                        $selected = (isset($user_row['country_code']) && $user_row['country_code'] == $c['country_code']) ? 'selected' : '';
+                        echo '<option value="'.$c['country_code'].'" '.$selected.'>'.$c['name'].'</option>';
+                    }
+                    ?>
+                </select>
             </div>
 
-            <div class="form-group">
-                <label>Prezime (Last Name):</label>
-                <input type="text" name="last_name" value="<?php echo isset($edit_row['last_name']) ? $edit_row['last_name'] : ''; ?>" required>
-            </div>
-
-            <div class="form-group">
-                <label>E-mail:</label>
-                <input type="email" name="email" value="<?php echo isset($edit_row['email']) ? $edit_row['email'] : ''; ?>" required>
-            </div>
-
-            <div class="form-group">
-                <label>Korisničko ime (Username):</label>
-                <input type="text" name="username" value="<?php echo isset($edit_row['username']) ? $edit_row['username'] : ''; ?>" required>
-            </div>
-
-            <div class="form-group">
-                <label>Lozinka:</label>
-                <input type="password" name="password" placeholder="<?php echo ($edit_mode) ? 'Ostavite prazno ako ne mijenjate' : 'Unesite lozinku'; ?>" <?php echo ($edit_mode) ? '' : 'required'; ?>>
-            </div>
-
-            <div class="form-group">
-                <label>Uloga (Role):</label>
-                <select name="role">
-                    <option value="user" <?php if(isset($edit_row['role']) && $edit_row['role'] == 'user') echo 'selected'; ?>>Korisnik (User)</option>
-                    <option value="admin" <?php if(isset($edit_row['role']) && $edit_row['role'] == 'admin') echo 'selected'; ?>>Administrator</option>
+            <div class="form-group"><label>Lozinka:</label><input type="password" name="password" placeholder="***"></div>
+            
+            <div class="form-group"><label>Uloga:</label>
+                <select name="role" class="form-control" required>
+                    <option value="user" <?php if(isset($user_row['role']) && $user_row['role'] == 'user') echo 'selected'; ?>>Korisnik</option>
+                    <option value="editor" <?php if(isset($user_row['role']) && $user_row['role'] == 'editor') echo 'selected'; ?>>Editor</option>
+                    <option value="admin" <?php if(isset($user_row['role']) && $user_row['role'] == 'admin') echo 'selected'; ?>>Admin</option>
                 </select>
             </div>
             
-            <button type="submit" name="save_user" class="btn-submit">Spremi Korisnika</button>
+            <button type="submit" name="save_user" class="btn-submit">Spremi</button>
         </form>
     </div>
 
 <?php else: ?>
 
+    <?php
+    $results_per_page = 10;
+    $sql_count = "SELECT count(id) AS total FROM users";
+    $result_count = mysqli_query($dbc, $sql_count);
+    $row_count = mysqli_fetch_assoc($result_count);
+    $total_results = $row_count['total'];
+    $number_of_pages = ceil($total_results / $results_per_page);
+    $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $start_from = ($page - 1) * $results_per_page;
+    ?>
+
     <div class="table-actions">
-        <a href="index.php?menu=5&action=users&add=1" class="btn-add-new">+ Novi Korisnik</a>
+        <a href="<?php echo $link_admin; ?>&action=users&add=1" class="btn-add-new">+ Novi Korisnik</a>
     </div>
     
     <div class="admin-table-container">
+        <h3>Popis korisnika</h3>
         <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Ime i Prezime</th>
-                    <th>Username</th>
-                    <th>E-mail</th>
-                    <th>Uloga</th>
-                    <th>Akcije</th>
-                </tr>
-            </thead>
+            <thead><tr><th>Ime</th><th>Email</th><th>Država</th><th>Uloga</th><th>Akcije</th></tr></thead>
             <tbody>
                 <?php
-                $r = mysqli_query($dbc, "SELECT * FROM users ORDER BY id DESC");
+                $q = "SELECT users.*, countries.name AS country_name 
+                      FROM users 
+                      LEFT JOIN countries ON users.country_code = countries.country_code 
+                      ORDER BY users.role ASC, users.last_name ASC 
+                      LIMIT $start_from, $results_per_page";
+                
+                $r = mysqli_query($dbc, $q);
+                
                 while($row = mysqli_fetch_assoc($r)) {
-                    $role_style = ($row['role'] == 'admin') ? 'color:red; font-weight:bold;' : 'color:green;';
+                    $role_style = '';
+                    if($row['role'] == 'admin') $role_style = 'font-weight:bold; color:red;';
+                    elseif($row['role'] == 'editor') $role_style = 'font-weight:bold; color:blue;';
+                    
+                    $country_display = $row['country_name'] ? $row['country_name'] : '-';
                     
                     echo "<tr>
-                        <td>{$row['id']}</td>
-                        <td>{$row['first_name']} {$row['last_name']}</td>
-                        <td>{$row['username']}</td>
+                        <td>{$row['first_name']} {$row['last_name']} ({$row['username']})</td>
                         <td>{$row['email']}</td>
-                        <td style='$role_style'>" . strtoupper($row['role']) . "</td>
+                        <td>{$country_display}</td> <td style='$role_style'>" . ucfirst($row['role']) . "</td>
                         <td>
-                            <a href='index.php?menu=5&action=users&edit=1&id={$row['id']}' class='action-btn edit'>Uredi</a>
-                            <a href='index.php?menu=5&action=users&delete_user_id={$row['id']}' class='action-btn delete' onclick='return confirm(\"Jeste li sigurni da želite obrisati korisnika {$row['username']}?\")'>Obriši</a>
-                        </td>
-                    </tr>";
+                            <a href='$link_admin&action=users&edit=1&id={$row['id']}' class='action-btn edit'>Uredi</a>"; 
+                            if ($row['id'] != $_SESSION['user_id']) {
+                                echo "<a href='$link_admin&action=users&delete_id={$row['id']}' class='action-btn delete' onclick='return confirm(\"Obrisati?\")'>Obriši</a>";
+                            }
+                    echo "</td></tr>";
                 }
                 ?>
             </tbody>
         </table>
-    </div>
 
+        <div style="margin-top: 20px; text-align: center;">
+            <?php
+            for ($i = 1; $i <= $number_of_pages; $i++) {
+                $active = ($i == $page) ? "background-color: #007BFF; color: white;" : "background-color: #eee;";
+                echo '<a href="' . $link_admin . '&action=users&page=' . $i . '" 
+                         style="display:inline-block; padding:8px 12px; margin:2px; text-decoration:none; border-radius:4px; ' . $active . '">' . $i . '</a> ';
+            }
+            ?>
+        </div>
+    </div>
 <?php endif; ?>

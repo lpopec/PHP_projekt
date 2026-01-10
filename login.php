@@ -22,7 +22,7 @@ if (isset($_POST['submit'])) {
             $_SESSION['role'] = $role; 
             
             if($role == 'admin') {
-                header("Location: index.php?menu=5");
+                header("Location: $link_admin");
             } else {
                 header("Location: index.php");
             }

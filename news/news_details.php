@@ -1,19 +1,19 @@
 <?php
 if (isset($_GET['id'])) {
-    $id = intval($_GET['id']); 
-    
+    $id = intval($_GET['id']);
     $query = "SELECT * FROM news WHERE id = $id";
     $result = mysqli_query($dbc, $query);
     
     if ($row = mysqli_fetch_array($result)) {
         $img_src = !empty($row['image']) ? $row['image'] : '';
-        $date = date('d. F Y.', strtotime($row['date'])); // Format: 10. October 2023.
+        $date = date('d. F Y.', strtotime($row['date'])); 
         
-        // Prikaz HTML-a
+        $gallery_query = "SELECT * FROM news_images WHERE news_id = $id";
+        $gallery_result = mysqli_query($dbc, $gallery_query);
+
         echo '
         <div class="news-details-wrapper">
-            
-            <a href="index.php?menu=2" class="back-link">&larr; Natrag na vijesti</a>
+            <a href="' . $link_news . '" class="back-link">&larr; Natrag na vijesti</a>
             
             <article class="single-news">
                 <header class="news-header">
@@ -34,14 +34,42 @@ if (isset($_GET['id'])) {
                     <p class="lead">' . $row['description'] . '</p>
                     <hr>
                     ' . nl2br($row['content']) . '
-                </div>
-            </article>
+                </div>';
+
+                if (mysqli_num_rows($gallery_result) > 0) {
+                    echo '<div class="news-gallery-section">';
+                    echo '<h3>Galerija fotografija</h3>';
+                    echo '<div class="news-gallery-grid">';
+                    
+                    while($g_row = mysqli_fetch_assoc($gallery_result)) {
+                        echo '<div class="news-gallery-item">
+                                <img src="' . $g_row['image_path'] . '" onclick="openModal(\'' . $g_row['image_path'] . '\')">
+                              </div>';
+                    }
+                    
+                    echo '</div></div>';
+                }
+            echo '</article>
         </div>';
         
     } else {
         echo "<p>Tražena vijest ne postoji.</p>";
     }
 } else {
-    header("Location: index.php?menu=2");
+    header("Location: $link_news");
 }
 ?>
+
+<div id="imageModal" class="modal-simple" onclick="this.style.display='none'">
+  <span class="close-simple">&times;</span>
+  <img class="modal-content-simple" id="img01">
+</div>
+
+<script>
+function openModal(src) {
+    var modal = document.getElementById("imageModal");
+    var modalImg = document.getElementById("img01");
+    modal.style.display = "block";
+    modalImg.src = src;
+}
+</script>
