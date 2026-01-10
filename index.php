@@ -29,7 +29,7 @@
             <ul>
                 <li><a href="index.php?menu=1" class="<?php echo ($trenutna_stranica == 1) ? 'active' : ''; ?>">Home</a></li>
                 <li><a href="index.php?menu=2" class="<?php echo ($trenutna_stranica == 2) ? 'active' : ''; ?>">News</a></li>
-                <li><a href="index.php?menu=10" class="<?php echo ($menu == 10) ? 'active' : ''; ?>">Gallery</a></li>
+                <li><a href="index.php?menu=10" class="<?php echo ($trenutna_stranica == 10) ? 'active' : ''; ?>">Gallery</a></li>
                 <li><a href="index.php?menu=3" class="<?php echo ($trenutna_stranica == 3) ? 'active' : ''; ?>">Contact</a></li>
                 <li><a href="index.php?menu=4" class="<?php echo ($trenutna_stranica == 4) ? 'active' : ''; ?>">About</a></li>
 
