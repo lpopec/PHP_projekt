@@ -45,6 +45,9 @@
 <body>
     
     <header>
+        <div class="site-banner">
+            <img src="img/def/banner.png" alt="Auto Moto Portal Banner">
+        </div>
         <nav class="nav-style">
             <ul>
                 <li><a href="<?php echo $link_home; ?>" class="<?php echo ($trenutna_stranica == $id_home) ? 'active' : ''; ?>">Home</a></li>

@@ -1263,3 +1263,37 @@ main {
     cursor: pointer;
     z-index: 10001;
 }
+
+.site-banner {
+    width: 100%;
+    background-color: #f8f8f8;
+    border-bottom: 1px solid #ddd;
+}
+
+.site-banner img {
+    width: 100%; 
+    height: 150px;
+    object-fit: cover; 
+    object-position: center; 
+    display: block; 
+}
+
+.nav-style {
+    margin-top: 0; 
+}
+
+.video-container {
+    max-width: 900px; 
+    margin: 40px auto; 
+    background-color: #000; 
+    border-radius: 8px; 
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2); 
+    overflow: hidden; 
+    line-height: 0; 
+}
+
+.video-container video {
+    width: 100%; 
+    height: auto; 
+    display: block; 
+}

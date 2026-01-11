@@ -19,14 +19,11 @@
     </div>
 
     <div class="video-container">
-        <iframe 
-            src="https://www.youtube.com/watch?v=_VMFsAKHzHM" 
-            title="Automotive Cinematic" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-            allowfullscreen>
-        </iframe>
+        <video width="100%" height="auto" controls>
+            <source src="video/video.mp4" type="video/mp4">
+            Vaš preglednik ne podržava video tag.
+        </video>
     </div>
-
     <div class="about-text">
         <p>
             Gledajući u budućnost, pratimo veliku transformaciju industrije prema elektrifikaciji i autonomnoj vožnji. 
