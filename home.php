@@ -1,24 +1,27 @@
 <div class="home-content">
-    <h1>Dobrodošli na našu digitalnu priču</h1>
+    <h1>Dobrodošli u svijet brzine i oktana</h1>
 
     <p>
-        Drago nam je što ste ovdje. Ova web stranica rezultat je predanog rada i želje da predstavimo naše projekte svijetu. 
-        Kroz moderan dizajn i intuitivno korisničko iskustvo, cilj nam je pružiti vam sve potrebne informacije na brz i jednostavan način.
+        Drago nam je što ste ovdje. Naš portal je vaša prva postaja za najnovije vijesti iz automobilske industrije. 
+        Od ekskluzivnih testova najnovijih modela do dubinskih analiza tržišnih trendova, cilj nam je donijeti vam 
+        informacije iz prve ruke, brzo i objektivno.
     </p>
 
     <figure class="featured-image">
-        <img src="https://placehold.co/800x400" alt="Timski rad u uredu">
-        <figcaption>Naš tim predano radi na razvoju novih rješenja u modernom uredu.</figcaption>
+        <img src="img/def/home-page.png" alt="Sportski automobil na stazi" onerror="this.src='https://placehold.co/800x400?text=Auto+Moto+Svijet'">
+        <figcaption>Testiramo granice performansi najnovijih modela na tržištu.</figcaption>
     </figure>
 
     <p>
-        Vjerujemo da tehnologija treba služiti ljudima. Zato se u svakom našem projektu fokusiramo na pristupačnost, brzinu i sigurnost. 
-        Bez obzira koristite li mobitel, tablet ili računalo, naše sučelje se prilagođava vama kako bi iskustvo bilo besprijekorno.
+        Automobili nisu samo prijevozno sredstvo, oni su strast. Bilo da vas zanimaju električna vozila budućnosti, 
+        bezvremenski klasici ili uzbuđenja Formule 1, naš tim entuzijasta pokriva svaku temu s posebnom pažnjom. 
+        Naša misija je spojiti tehnologiju i emociju vožnje na jednom mjestu.
     </p>
 
     <p>
-        Hvala vam što nas pratite. Pozivamo vas da istražite ostatak stranice, pročitate najnovije vijesti ili nas kontaktirate 
-        ako imate bilo kakvih pitanja. Vaša povratna informacija nam je izuzetno važna za daljnji napredak.
+        Hvala vam što nas pratite. Pozivamo vas da istražite našu <a href="index.php?menu=10">galeriju</a>, 
+        pročitate najnovije <a href="index.php?menu=2">vijesti</a> ili nas kontaktirate ako imate prijedlog za temu. 
+        Vaša vožnja kroz svijet automoto novosti počinje ovdje.
     </p>
 
     <div class="social-share">
@@ -30,6 +33,6 @@
             <a href="https://x.com" target="_blank">
                 <img src="img/icons/x-icon.svg" alt="Twitter">
             </a>
-        </div>
+            </div>
     </div>
 </div>
